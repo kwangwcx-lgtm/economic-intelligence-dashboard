@@ -340,6 +340,9 @@
         alert("偵測到您直接開啟 HTML 檔案。由於瀏覽器安全限制，數據抓取可能會失敗。建議將檔案部署到 GitHub Pages 或使用本機伺服器開啟。");
       }
 
+      // First sync forecasts from ForexFactory
+      await syncForexFactoryForecasts();
+
       for (const ind of INDICATORS) {
         logDebug(`正在抓取 ${ind.name}...`);
         const res = await getData(ind);
@@ -387,6 +390,53 @@
             <div class="stat-box">
               <span class="stat-label">市場預測</span>
               <div class="stat-value sub">${customForecasts[ind.id] || ind.defaultForecast}</div>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">前期數值</span>
+              <div class="stat-value sub" id="prev-${ind.id}" style="color:var(--muted)">--</div>
+            </div>
+          </div>
+
+          <div class="chart-outer">
+            <div class="chart-loading" id="loading-${ind.id}">正在從數據源獲取歷史數據...</div>
+            <div id="chart-root-${ind.id}" style="width:100%; height:100%;"></div>
+          </div>
+        `;
+        stack.appendChild(card);
+
+        const container = document.getElementById(`chart-root-${ind.id}`);
+        const chart = LightweightCharts.createChart(container, {
+          layout: { background: { color: 'transparent' }, textColor: '#86868b', fontSize: 11 },
+          grid: { vertLines: { color: '#f5f5f7' }, horzLines: { color: '#f5f5f7' } },
+          crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+          rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.2, bottom: 0.2 } },
+          timeScale: { borderVisible: false, fixLeftEdge: true }
+        });
+
+        const series = chart.addAreaSeries({
+          lineColor: ind.color,
+          topColor: ind.color + '33',
+          bottomColor: ind.color + '00',
+          lineWidth: 2,
+        });
+
+        charts[ind.id] = { chart, series };
+
+        new ResizeObserver(entries => {
+          if (entries.length === 0) return;
+          const { width, height } = entries[0].contentRect;
+          chart.applyOptions({ width, height });
+          chart.timeScale().fitContent();
+        }).observe(container);
+      }
+      refreshAll();
+    }
+
+    init();
+  </script>
+</body>
+</html>
+| ind.defaultForecast}</div>
             </div>
             <div class="stat-box">
               <span class="stat-label">前期數值</span>
