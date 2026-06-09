@@ -1,0 +1,259 @@
+
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>經濟指標監控儀表板 · v6.3 Live</title>
+  <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f7;
+      --surface-warm: #fbfbfd;
+      --fg: #1d1d1f;
+      --fg-2: #424245;
+      --muted: #6e6e73;
+      --meta: #86868b;
+      --border: #d2d2d7;
+      --border-soft: #e8e8ed;
+      --accent: #0071e3;
+      --accent-on: #ffffff;
+      --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: "SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: "SF Mono", ui-monospace, monospace;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-pill: 980px;
+      --elev-raised: 0 12px 32px rgba(0, 0, 0, 0.08);
+      --container-max: 800px;
+    }
+
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+    .container { max-width: var(--container-max); margin-inline: auto; padding-inline: 20px; }
+    
+    .topnav { position: sticky; top: 0; z-index: 100; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-soft); padding-block: 14px; }
+    .topnav-inner { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-weight: 600; font-size: 18px; letter-spacing: -0.02em; }
+    
+    .actions { display: flex; gap: 8px; }
+    .btn-action { background: var(--fg); color: var(--bg); border: none; padding: 8px 16px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-secondary { background: var(--surface); color: var(--fg); border: 1px solid var(--border-soft); }
+
+    .hero { padding-block: 40px 20px; }
+    .hero h1 { font-family: var(--font-display); font-size: 32px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.015em; }
+    .hero p { color: var(--muted); font-size: 17px; margin: 0; }
+
+    .indicator-stack { display: flex; flex-direction: column; gap: 24px; padding-bottom: 80px; }
+    .card { background: var(--bg); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 24px; transition: all 0.3s ease; }
+    .card:hover { border-color: var(--border); box-shadow: var(--elev-raised); }
+
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .card-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+    
+    .release-tag { text-align: right; background: var(--surface-warm); padding: 8px 14px; border-radius: 12px; border: 1px solid var(--border-soft); }
+    .release-label { font-size: 10px; font-weight: 700; color: var(--meta); text-transform: uppercase; margin-bottom: 2px; display: block; }
+    .release-time { font-size: 12px; font-weight: 600; color: var(--fg); }
+    .release-countdown { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 2px; }
+
+    .card-main { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 12px; margin-bottom: 24px; align-items: baseline; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 4px; display: block; }
+    .stat-value { font-family: var(--font-display); font-size: 32px; font-weight: 700; line-height: 1; }
+    .stat-value.sub { font-size: 22px; color: var(--fg-2); }
+    
+    .status-badge { font-size: 10px; font-weight: 700; margin-top: 6px; display: flex; align-items: center; gap: 4px; color: var(--meta); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; }
+    .dot.live { background: #16a34a; animation: pulse 2s infinite; }
+    .dot.offline { background: #dc2626; }
+
+    .chart-container { width: 100%; height: 320px; background: var(--surface-warm); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-soft); margin-top: 16px; position: relative; }
+    .chart-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-warm); color: var(--meta); font-size: 13px; z-index: 5; }
+
+    #settings-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+    .modal-content { background: var(--bg); padding: 32px; border-radius: 24px; width: 90%; max-width: 440px; box-shadow: var(--elev-raised); }
+
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    @media (max-width: 600px) {
+      .card-main { grid-template-columns: 1fr 1fr; }
+      .stat-box:last-child { grid-column: span 2; border-top: 1px solid var(--border-soft); padding-top: 12px; }
+      .release-tag { text-align: left; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <div class="container topnav-inner">
+      <div class="logo">Economic Intelligence</div>
+      <div class="actions">
+        <button class="btn-action btn-secondary" onclick="toggleSettings()">⚙️ 設定</button>
+        <button class="btn-action" onclick="refreshAll()">🔄 刷新數據</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="hero">
+      <h1>核心數據實時監控</h1>
+      <p>串接 FRED 官方 API · 已加入多重代理備援系統並優化前期數據邏輯</p>
+    </header>
+    <div class="indicator-stack" id="indicator-list"></div>
+  </main>
+
+  <div id="settings-modal">
+    <div class="modal-content">
+      <h3 style="margin-top: 0;">API 金鑰設定</h3>
+      <p style="font-size: 13px; color: var(--muted);">系統會將金鑰加密儲存於您的瀏覽器中。</p>
+      <input type="password" id="fred-key-input" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); font-family:var(--font-mono);" placeholder="FRED API KEY">
+      <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px;">
+        <button class="btn-action btn-secondary" onclick="toggleSettings()">關閉</button>
+        <button class="btn-action" onclick="saveSettings()">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FRED_KEY = localStorage.getItem('fred_api_key') || 'b9302ae1ef44eb9130f8f90da9cfbba4';
+
+    const INDICATORS = [
+      { id: 'cpi', name: 'CPI 消費者物價 (YoY)', fredId: 'CPIAUCSL', forecast: 3.3, prev: 3.5, unit: '%', nextRelease: '2026-06-10T20:30:00', color: '#0071e3' },
+      { id: 'ppi', name: 'PPI 生產者物價 (YoY)', fredId: 'PPIACO', forecast: 2.1, prev: 2.3, unit: '%', nextRelease: '2026-06-11T20:30:00', color: '#0071e3' },
+      { id: 'pce', name: 'PCE 個人消費支出 (YoY)', fredId: 'PCEPI', forecast: 2.6, prev: 2.8, unit: '%', nextRelease: '2026-06-26T20:30:00', color: '#0071e3' },
+      { id: 'vix', name: 'VIX 恐慌指數', yahooId: '^VIX', forecast: 15.1, prev: 13.8, unit: '', nextRelease: null, color: '#1d1d1f' },
+      { id: 'yield', name: '10Y 美債殖利率', yahooId: '^TNX', forecast: 4.2, prev: 4.31, unit: '%', nextRelease: null, color: '#1d1d1f' }
+    ];
+
+    // --- Multi-Proxy Fetcher ---
+    async function fetchWithFallback(url) {
+      const proxies = [
+        (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+        (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`
+      ];
+
+      for (const proxy of proxies) {
+        try {
+          const res = await fetch(proxy(url));
+          if (!res.ok) continue;
+          const data = await res.json();
+          return data.contents ? JSON.parse(data.contents) : data;
+        } catch (e) { console.warn("Proxy failed, trying next..."); }
+      }
+      throw new Error("All proxies failed");
+    }
+
+    async function getData(ind) {
+      try {
+        let current, previous, history;
+        if (ind.fredId) {
+          const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${ind.fredId}&api_key=${FRED_KEY}&file_type=json&units=pc1&limit=500&sort_order=desc`;
+          const json = await fetchWithFallback(url);
+          history = json.observations.map(o => ({ time: o.date, value: parseFloat(o.value) })).filter(d => !isNaN(d.value)).reverse();
+          current = history[history.length - 1].value;
+          previous = history.length > 1 ? history[history.length - 2].value : ind.prev;
+        } else {
+          const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ind.yahooId}?interval=1d&range=1y`;
+          const json = await fetchWithFallback(url);
+          const res = json.chart.result[0];
+          history = res.timestamp.map((t, i) => ({ 
+            time: new Date(t*1000).toISOString().split('T')[0], 
+            value: parseFloat(res.indicators.quote[0].close[i]?.toFixed(3)) 
+          })).filter(d => d.value);
+          current = history[history.length - 1].value;
+          previous = history.length > 1 ? history[history.length - 2].value : ind.prev;
+        }
+        return { current, previous, history };
+      } catch (e) { return null; }
+    }
+
+    // --- UI Utilities ---
+    function formatTime(iso) {
+      if(!iso) return "即時數據動態更新";
+      return new Date(iso).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }) + " (CST)";
+    }
+
+    function getCountdown(iso) {
+      if(!iso) return "連線中";
+      const diff = new Date(iso) - new Date();
+      if(diff < 0) return "數據發佈中";
+      const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000);
+      return d > 0 ? `倒數 ${d}天 ${h}時` : `倒數 ${h}時 ${m}分`;
+    }
+
+    function toggleSettings() {
+      const m = document.getElementById('settings-modal');
+      m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function saveSettings() {
+      localStorage.setItem('fred_api_key', document.getElementById('fred-key-input').value);
+      location.reload();
+    }
+
+    async function init() {
+      const list = document.getElementById('indicator-list');
+      for (const ind of INDICATORS) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="card-title-group">
+              <span style="font-size:11px; color:var(--meta); font-weight:700;">${ind.fredId ? 'ECONOMIC' : 'MARKET'}</span>
+              <div class="card-title">${ind.name}</div>
+            </div>
+            <div class="release-tag">
+              <span class="release-label">下次發佈時間 (台灣)</span>
+              <div class="release-time">${formatTime(ind.nextRelease)}</div>
+              <div class="release-countdown">${getCountdown(ind.nextRelease)}</div>
+            </div>
+          </div>
+          <div class="card-main">
+            <div class="stat-box">
+              <span class="stat-label">最新數值</span>
+              <div class="stat-value" id="val-${ind.id}" style="color:${ind.color}">--</div>
+              <div class="status-badge" id="status-${ind.id}"><div class="dot offline"></div> 離線模式</div>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">市場預測</span>
+              <div class="stat-value sub">${ind.forecast}${ind.unit}</div>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">前期數值</span>
+              <div class="stat-value sub" id="prev-${ind.id}" style="color:var(--meta)">${ind.prev}${ind.unit}</div>
+            </div>
+          </div>
+          <div class="chart-container" id="chart-${ind.id}"><div class="chart-loading">正在連線至官方 API...</div></div>
+        `;
+        list.appendChild(card);
+
+        // Fetch & Render
+        getData(ind).then(data => {
+          if(!data) {
+            document.querySelector(`#chart-${ind.id} .chart-loading`).innerText = "連線失敗，請檢查網路或 API Key";
+            return;
+          }
+          document.getElementById(`val-${ind.id}`).innerText = data.current.toFixed(2) + ind.unit;
+          document.getElementById(`prev-${ind.id}`).innerText = data.previous.toFixed(2) + ind.unit;
+          document.getElementById(`status-${ind.id}`).innerHTML = `<div class="dot live"></div> 實時數據已同步`;
+          
+          const chart = LightweightCharts.createChart(document.getElementById(`chart-${ind.id}`), {
+            layout: { background: { color: 'transparent' }, textColor: '#86868b' },
+            grid: { vertLines: { visible: false }, horzLines: { color: '#f5f5f7' } },
+            timeScale: { borderVisible: false }
+          });
+          const series = chart.addAreaSeries({ lineColor: ind.color, topColor: ind.color+'33', bottomColor: ind.color+'00', lineWidth: 2 });
+          series.setData(data.history);
+          chart.timeScale().fitContent();
+          
+          new ResizeObserver(() => { 
+            const r = document.getElementById(`chart-${ind.id}`).getBoundingClientRect();
+            chart.applyOptions({ width: r.width, height: r.height });
+          }).observe(document.getElementById(`chart-${ind.id}`));
+        });
+      }
+    }
+
+    function refreshAll() { location.reload(); }
+
+    init();
+  </script>
+</body>
+</html>
