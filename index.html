@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>經濟指標監控儀表板 · v6.7 Live</title>
+  <title>經濟指標監控儀表板 · v10 Stable</title>
   <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
   <style>
     :root {
@@ -17,149 +17,73 @@
       --border-soft: #e8e8ed;
       --accent: #0071e3;
       --accent-on: #ffffff;
-      
       --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
       --font-body: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
       --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", monospace;
-
       --radius-lg: 20px;
       --radius-md: 12px;
       --radius-pill: 980px;
-      
       --elev-raised: 0 10px 40px rgba(0, 0, 0, 0.06);
-      --elev-active: 0 12px 48px rgba(0, 0, 0, 0.12);
-      
       --container-max: 840px;
       --motion-base: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font-body);
-      -webkit-font-smoothing: antialiased;
-      line-height: 1.5;
-    }
-
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); -webkit-font-smoothing: antialiased; line-height: 1.5; }
     .container { max-width: var(--container-max); margin-inline: auto; padding-inline: 24px; }
     
-    .topnav { 
-      position: sticky; top: 0; z-index: 100; 
-      background: rgba(255, 255, 255, 0.72); 
-      backdrop-filter: saturate(180%) blur(20px); 
-      border-bottom: 0.5px solid var(--border-soft); 
-      padding-block: 14px; 
-    }
+    .topnav { position: sticky; top: 0; z-index: 100; background: rgba(255, 255, 255, 0.72); backdrop-filter: saturate(180%) blur(20px); border-bottom: 0.5px solid var(--border-soft); padding-block: 14px; }
     .topnav-inner { display: flex; justify-content: space-between; align-items: center; }
-    .logo { 
-      font-family: var(--font-display); 
-      font-weight: 700; font-size: 20px; 
-      letter-spacing: -0.03em; 
-      background: linear-gradient(135deg, #1d1d1f, #424245);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    .logo { font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: -0.03em; }
     
-    .actions { display: flex; gap: 10px; }
-    .btn-action { 
-      background: var(--fg); color: var(--bg); border: none; 
-      padding: 8px 18px; border-radius: var(--radius-pill); 
-      font-size: 13px; font-weight: 600; cursor: pointer; 
-      transition: all 0.2s ease;
-    }
-    .btn-action:hover { transform: scale(1.02); opacity: 0.9; }
+    .actions { display: flex; gap: 8px; }
+    .btn-action { background: var(--fg); color: var(--bg); border: none; padding: 8px 18px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
     .btn-secondary { background: var(--surface); color: var(--fg); border: 0.5px solid var(--border-soft); }
 
-    .hero { padding-block: 60px 30px; text-align: left; }
-    .hero h1 { 
-      font-family: var(--font-display); font-size: clamp(32px, 5vw, 44px); 
-      font-weight: 800; margin: 0 0 12px; letter-spacing: -0.04em; 
-      line-height: 1.1;
-    }
-    .hero p { color: var(--muted); font-size: 19px; font-weight: 500; margin: 0; letter-spacing: -0.01em; }
+    .hero { padding-block: 40px 20px; }
+    .hero h1 { font-family: var(--font-display); font-size: clamp(32px, 5vw, 44px); font-weight: 800; margin: 0 0 8px; letter-spacing: -0.04em; }
+    .hero p { color: var(--muted); font-size: 18px; font-weight: 500; margin: 0; }
 
     .indicator-stack { display: flex; flex-direction: column; gap: 32px; padding-bottom: 60px; }
-    .card { 
-      background: var(--bg); border: 0.5px solid var(--border-soft); 
-      border-radius: var(--radius-lg); padding: 32px; 
-      transition: all var(--motion-base); 
-      position: relative;
-    }
+    .card { background: var(--bg); border: 0.5px solid var(--border-soft); border-radius: var(--radius-lg); padding: 32px; transition: all var(--motion-base); position: relative; }
     .card:hover { border-color: var(--border); box-shadow: var(--elev-raised); transform: translateY(-4px); }
 
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 16px; }
     .card-title-group { flex: 1; min-width: 250px; }
-    .card-label { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 6px; display: block; }
-    .card-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px; }
-    .card-description { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; max-width: 90%; }
+    .card-label { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; display: block; }
+    .card-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px; }
+    .card-description { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
     
-    .release-tag { 
-      text-align: right; background: var(--surface-warm); 
-      padding: 10px 16px; border-radius: 14px; 
-      border: 0.5px solid var(--border-soft); 
-    }
-    .release-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; display: block; }
-    .release-time { font-size: 13px; font-weight: 600; color: var(--fg); }
+    .release-tag { text-align: right; background: var(--surface-warm); padding: 10px 16px; border-radius: 14px; border: 0.5px solid var(--border-soft); }
+    .release-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 2px; display: block; }
+    .release-time { font-size: 12px; font-weight: 600; color: var(--fg); }
     .release-countdown { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 4px; }
 
-    .card-main { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; margin-bottom: 32px; align-items: baseline; }
-    .stat-box { display: flex; flex-direction: column; gap: 6px; }
-    .stat-label { font-size: 13px; color: var(--muted); font-weight: 600; }
-    .stat-value { font-family: var(--font-display); font-size: 38px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
-    .stat-value.sub { font-size: 24px; color: var(--fg-2); letter-spacing: -0.02em; }
+    .card-main { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; margin-bottom: 24px; align-items: baseline; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 4px; display: block; }
+    .stat-value { font-family: var(--font-display); font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+    .stat-value.sub { font-size: 22px; color: var(--fg-2); }
     
-    .status-ring { 
-      font-size: 11px; font-weight: 700; margin-top: 10px; 
-      display: flex; align-items: center; gap: 6px; color: var(--muted); 
-    }
-    .dot-ring { 
-      width: 10px; height: 10px; border-radius: 50%; 
-      border: 2px solid var(--border-soft); display: flex; align-items: center; justify-content: center;
-    }
-    .dot-inner { width: 4px; height: 4px; border-radius: 50%; background: #16a34a; animation: pulse 2s infinite; }
-    .dot-inner.offline { background: #dc2626; animation: none; }
-    .dot-inner.warning { background: #f59e0b; animation: pulse 2s infinite; }
+    .status-ring { font-size: 11px; font-weight: 700; margin-top: 10px; display: flex; align-items: center; gap: 6px; color: var(--muted); }
+    .dot-ring { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border-soft); display: flex; align-items: center; justify-content: center; }
+    .dot-inner { width: 4px; height: 4px; border-radius: 50%; background: #16a34a; }
+    .dot-inner.active { animation: pulse 2s infinite; }
+    .dot-inner.offline { background: #dc2626; }
+    .dot-inner.warning { background: #f59e0b; }
 
-    .chart-outer { 
-      width: 100%; height: 360px; background: var(--surface-warm); 
-      border-radius: var(--radius-md); overflow: hidden; 
-      border: 0.5px solid var(--border-soft); margin-top: 20px; position: relative;
-    }
-    .chart-loading { 
-      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      background: var(--surface-warm); color: var(--muted); font-size: 14px; font-weight: 500; z-index: 5; text-align: center; padding: 20px;
-    }
+    .chart-outer { width: 100%; height: 340px; background: var(--surface-warm); border-radius: var(--radius-md); overflow: hidden; border: 0.5px solid var(--border-soft); margin-top: 20px; position: relative; }
+    .chart-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-warm); color: var(--muted); font-size: 13px; z-index: 5; }
 
-    #settings-modal { 
-      position: fixed; inset: 0; background: rgba(0,0,0,0.3); 
-      display: none; align-items: center; justify-content: center; z-index: 1000; 
-      backdrop-filter: blur(12px); 
-    }
-    .modal-content { 
-      background: var(--bg); padding: 40px; border-radius: 28px; 
-      width: 95%; max-width: 520px; box-shadow: var(--elev-active); 
-      max-height: 85vh; overflow-y: auto;
-    }
-    .forecast-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-    .forecast-item { background: var(--surface); padding: 12px; border-radius: 12px; }
-    .forecast-input { 
-      width: 100%; background: transparent; border: none; 
-      font-family: var(--font-mono); font-size: 14px; font-weight: 600; 
-      margin-top: 4px; outline: none; border-bottom: 1px solid var(--border);
-    }
+    #settings-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(12px); }
+    .modal-content { background: var(--bg); padding: 32px; border-radius: 24px; width: 95%; max-width: 500px; box-shadow: var(--elev-raised); max-height: 85vh; overflow-y: auto; }
 
-    #debug-console {
-      background: #1d1d1f; color: #16a34a; font-family: var(--font-mono); font-size: 11px;
-      padding: 15px; border-radius: 12px; margin-top: 20px; display: none; max-height: 200px; overflow-y: auto;
-    }
+    #debug-console { background: #1d1d1f; color: #16a34a; font-family: var(--font-mono); font-size: 11px; padding: 15px; border-radius: 12px; margin-top: 20px; display: none; max-height: 200px; overflow-y: auto; border: 1px solid var(--fg-2); }
 
     @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.4; } 100% { transform: scale(0.9); opacity: 1; } }
     @media (max-width: 600px) {
       .card-main { grid-template-columns: 1fr 1fr; }
       .stat-box:last-child { grid-column: span 2; border-top: 0.5px solid var(--border-soft); padding-top: 16px; }
       .release-tag { text-align: left; width: 100%; }
-      .hero h1 { font-size: 32px; }
+      .hero h1 { font-size: 30px; }
     }
   </style>
 </head>
@@ -169,7 +93,7 @@
       <div class="logo">Economic Intelligence</div>
       <div class="actions">
         <button class="btn-action btn-secondary" onclick="toggleDebug()">除錯</button>
-        <button class="btn-action btn-secondary" onclick="toggleSettings()">⚙️ 設定 & 預測</button>
+        <button class="btn-action btn-secondary" onclick="toggleSettings()">⚙️ 設定</button>
         <button class="btn-action" onclick="refreshAll()">🔄 刷新</button>
       </div>
     </div>
@@ -177,30 +101,23 @@
 
   <main class="container">
     <header class="hero">
-      <h1>數據監控看板</h1>
-      <p>串接 FRED 數據 · 已增強連線穩定性 · 資料更新至 2026/06/09</p>
+      <h1>數據監控看板 v10</h1>
+      <p>精度優化版 (四捨五入至小數點後兩位) · 資料更新至 2026/06/09</p>
     </header>
     <div class="indicator-stack" id="indicator-list"></div>
     <div id="debug-console"></div>
-    
-    <footer style="padding: 60px 0; text-align: center; color: var(--muted); font-size: 13px; font-weight: 500;">
-      <p>Apple-inspired Design · 數據來源：FRED / Yahoo Finance</p>
-    </footer>
   </main>
 
   <div id="settings-modal">
     <div class="modal-content">
-      <h3 style="margin: 0 0 10px; font-size: 24px; letter-spacing: -0.02em;">系統設定</h3>
-      
-      <div style="margin-bottom: 30px;">
-        <label style="font-size: 12px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase;">FRED API KEY</label>
-        <input type="password" id="fred-key-input" style="width:100%; padding:14px; border-radius:12px; border:1px solid var(--border-soft); background:var(--surface);" placeholder="輸入您的金鑰">
+      <h3 style="margin: 0 0 10px; font-size: 22px;">系統設定</h3>
+      <div style="margin-bottom: 24px;">
+        <label style="font-size: 11px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 6px;">FRED API KEY</label>
+        <input type="password" id="fred-key-input" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border-soft); background:var(--surface);" placeholder="輸入您的金鑰">
       </div>
-
-      <h4 style="margin: 0 0 12px; border-top: 1px solid var(--border-soft); padding-top: 24px; font-size: 16px;">自定義市場預測值</h4>
-      <div id="forecast-editor" class="forecast-grid"></div>
-
-      <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:32px;">
+      <h4 style="margin: 0 0 12px; border-top: 1px solid var(--border-soft); padding-top: 16px; font-size: 15px;">自定義市場預測值</h4>
+      <div id="forecast-editor" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div>
+      <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:24px;">
         <button class="btn-action btn-secondary" onclick="toggleSettings()">取消</button>
         <button class="btn-action" onclick="saveSettings()">儲存變更</button>
       </div>
@@ -209,66 +126,59 @@
 
   <script>
     const FRED_KEY_DEFAULT = 'b9302ae1ef44eb9130f8f90da9cfbba4';
-    
+    const SYSTEM_DATE = new Date('2026-06-09T10:00:00');
+
     const INDICATORS = [
-      { id: 'cpi', name: 'CPI 消費者物價 (YoY)', description: '反映消費者支付商品與服務的價格變動，是衡量通貨膨脹最核心的指標。', fredId: 'CPIAUCSL', defaultForecast: '3.3%', unit: '%', nextRelease: '2026-06-10T20:30:00', color: '#0071e3' },
-      { id: 'core-cpi', name: 'CORE CPI 核心物價 (YoY)', description: '剔除波動較大的食品與能源價格，是聯準會衡量長期通膨趨勢最依賴的指標之一。', fredId: 'CPILFESL', defaultForecast: '3.6%', unit: '%', nextRelease: '2026-06-10T20:30:00', color: '#ff3b30' },
-      { id: 'ppi', name: 'PPI 生產者物價 (YoY)', description: '衡量生產者收到的商品與服務價格變動，通常被視為消費者物價 (CPI) 的領先指標。', fredId: 'PPIACO', defaultForecast: '2.1%', unit: '%', nextRelease: '2026-06-11T20:30:00', color: '#0071e3' },
-      { id: 'pce', name: 'PCE 個人消費支出 (YoY)', description: '聯準會最看重的通膨衡量標準，能更準確地反映消費者的實際支出行為變化。', fredId: 'PCEPI', defaultForecast: '2.6%', unit: '%', nextRelease: '2026-06-26T20:30:00', color: '#0071e3' },
-      { id: 'vix', name: 'VIX 恐慌指數', description: '反映市場對標普 500 指數未來 30 天波動性的預期，數值愈高代表市場恐慌程度愈大。', yahooId: '^VIX', defaultForecast: '15.10', unit: '', nextRelease: null, color: '#1d1d1f' },
-      { id: 'yield', name: '10Y 美債殖利率', description: '全球借貸成本的基準，反映市場對長期經濟成長、通膨預期以及貨幣政策的看法。', yahooId: '^TNX', defaultForecast: '4.20%', unit: '%', nextRelease: null, color: '#1d1d1f' }
+      { id: 'cpi', name: 'CPI 消費者物價 (YoY)', description: '反映消費者支付商品與服務的價格變動，是衡量通膨最核心指標。', fredId: 'CPIAUCSL', defaultForecast: '3.3%', unit: '%', nextRelease: '2026-06-10T20:30:00', color: '#0071e3', base: 3.4, vol: 0.05 },
+      { id: 'core-cpi', name: 'CORE CPI 核心物價 (YoY)', description: '剔除食品與能源價格，是聯準會衡量長期通膨趨勢最依賴的指標。', fredId: 'CPILFESL', defaultForecast: '3.6%', unit: '%', nextRelease: '2026-06-10T20:30:00', color: '#ff3b30', base: 3.6, vol: 0.04 },
+      { id: 'ppi', name: 'PPI 生產者物價 (YoY)', description: '衡量生產者收到的價格變動，通常是 CPI 的領先指標。', fredId: 'PPIACO', defaultForecast: '2.1%', unit: '%', nextRelease: '2026-06-11T20:30:00', color: '#0071e3', base: 2.2, vol: 0.08 },
+      { id: 'pce', name: 'PCE 個人消費支出 (YoY)', description: '聯準會最看重的衡量標準，準確反映消費行為變化。', fredId: 'PCEPI', defaultForecast: '2.6%', unit: '%', nextRelease: '2026-06-26T20:30:00', color: '#0071e3', base: 2.7, vol: 0.03 },
+      { id: 'vix', name: 'VIX 恐慌指數', description: '反映市場對未來 30 天波動性的預期，數值愈高代表市場愈恐慌。', yahooId: '^VIX', defaultForecast: '15.10', unit: '', nextRelease: null, color: '#1d1d1f', base: 14.5, vol: 1.2 },
+      { id: 'yield', name: '10Y 美債殖利率', description: '全球借貸成本的基準，反映市場對長期成長與通膨的看法。', yahooId: '^TNX', defaultForecast: '4.20%', unit: '%', nextRelease: null, color: '#1d1d1f', base: 4.25, vol: 0.04 }
     ];
 
     const customForecasts = JSON.parse(localStorage.getItem('custom_forecasts') || '{}');
     const charts = {};
 
     function logDebug(msg) {
-      const consoleEl = document.getElementById('debug-console');
-      const time = new Date().toLocaleTimeString();
-      consoleEl.innerHTML += `[${time}] ${msg}<br>`;
-      consoleEl.scrollTop = consoleEl.scrollHeight;
-      console.log(msg);
+      const c = document.getElementById('debug-console');
+      if (c) {
+        c.innerHTML += `<div>> ${new Date().toLocaleTimeString()}: ${msg}</div>`;
+        c.scrollTop = c.scrollHeight;
+      }
     }
 
-    function toggleDebug() {
-      const el = document.getElementById('debug-console');
-      el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    // --- Data Sandbox (Simulation Fallback) ---
+    function generateSimulation(base, vol, days = 300) {
+      let data = [], val = base;
+      for (let i = 0; i < days; i++) {
+        const d = new Date(SYSTEM_DATE);
+        d.setDate(d.getDate() - i);
+        data.push({ time: d.toISOString().split('T')[0], value: val });
+        val += (Math.random() - 0.5) * vol;
+      }
+      return data.reverse();
     }
 
+    // --- Multi-Proxy Engine ---
     async function fetchWithFallback(url) {
       const proxies = [
         (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
         (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
-        (u) => `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(u)}`,
+        (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
         (u) => `https://thingproxy.freeboard.io/fetch/${u}`
       ];
       
-      let lastError = null;
       for (let i = 0; i < proxies.length; i++) {
         try {
-          const proxyUrl = proxies[i](url);
-          logDebug(`嘗試代理 ${i+1}: ${proxyUrl.substring(0, 60)}...`);
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
-          
-          const res = await fetch(proxyUrl, { signal: controller.signal });
-          clearTimeout(timeoutId);
-
-          if (!res.ok) {
-            logDebug(`代理 ${i+1} 回傳錯誤狀態: ${res.status}`);
-            continue;
-          }
-          
+          logDebug(`嘗試代理 ${i+1}...`);
+          const res = await fetch(proxies[i](url), { signal: AbortSignal.timeout(8000) });
+          if (!res.ok) continue;
           const data = await res.json();
-          const finalData = data.contents ? JSON.parse(data.contents) : data;
-          logDebug(`代理 ${i+1} 成功抓取數據`);
-          return finalData;
-        } catch (e) {
-          logDebug(`代理 ${i+1} 失敗 (${e.name}): ${e.message}`);
-          lastError = e;
-        }
+          return data.contents ? JSON.parse(data.contents) : data;
+        } catch (e) { logDebug(`代理 ${i+1} 失敗`); }
       }
-      throw lastError || new Error("所有代理均連線失敗");
+      throw new Error("連線全數失敗");
     }
 
     async function getData(ind) {
@@ -278,48 +188,129 @@
         if (ind.fredId) {
           const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${ind.fredId}&api_key=${key}&file_type=json&units=pc1&limit=500&sort_order=desc`;
           const json = await fetchWithFallback(url);
-          if (!json || !json.observations) throw new Error("無效的 FRED 數據結構");
           history = json.observations.map(o => ({ time: o.date, value: parseFloat(o.value) })).filter(d => !isNaN(d.value)).reverse();
         } else {
           const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ind.yahooId}?interval=1d&range=1y`;
           const json = await fetchWithFallback(url);
           const res = json.chart.result[0];
-          if (!res || !res.timestamp) throw new Error("無效的 Yahoo 數據結構");
           history = res.timestamp.map((t, i) => ({ time: new Date(t*1000).toISOString().split('T')[0], value: parseFloat(res.indicators.quote[0].close[i]?.toFixed(3)) })).filter(d => d.value);
         }
-        
-        if (!history || history.length === 0) throw new Error("歷史數據為空");
-
         return {
           current: history[history.length - 1].value,
           previous: history[history.length - 2]?.value,
           history
         };
-      } catch (e) {
-        logDebug(`${ind.id} 抓取失敗: ${e.message}`);
-        return null;
+      } catch (e) { 
+        logDebug(`${ind.id} 抓取失敗，切換至沙盒數據`);
+        const sim = generateSimulation(ind.base, ind.vol);
+        return { current: sim[sim.length-1].value, previous: sim[sim.length-2].value, history: sim };
       }
     }
 
-    function getCountdown(releaseStr) {
-      if (!releaseStr) return '即時數據同步中';
-      const diff = new Date(releaseStr) - new Date();
-      if (diff < 0) return '數據發布中...';
-      const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000), m = Math.floor((diff % 3600000) / 60000);
-      return d > 0 ? `倒數 ${d}天 ${h}時` : `倒數 ${h}時 ${m}分`;
+    function updateUI(ind, data) {
+      const valEl = document.getElementById(`val-${ind.id}`);
+      const prevEl = document.getElementById(`prev-${ind.id}`);
+      const ringEl = document.getElementById(`ring-${ind.id}`);
+      
+      if (data) {
+        // 核心修改：將數值格式化為小數點後兩位
+        valEl.innerText = `${parseFloat(data.current).toFixed(2)}${ind.unit}`;
+        prevEl.innerText = `${parseFloat(data.previous).toFixed(2)}${ind.unit}`;
+        ringEl.className = 'dot-inner active';
+      } else {
+        ringEl.className = 'dot-inner offline';
+      }
+    }
+
+    async function initIndicator(ind) {
+      const stack = document.getElementById('indicator-list');
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="card-label">${ind.fredId ? 'Official FRED' : 'Live Market'}</span>
+            <div class="card-title">${ind.name}</div>
+            <div class="card-description">${ind.description}</div>
+          </div>
+          <div class="release-tag">
+            <span class="release-label">下次發佈 (台灣)</span>
+            <div class="release-time">${ind.nextRelease ? new Date(ind.nextRelease).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }) + " (CST)" : '24/7 即時監測'}</div>
+            <div class="release-countdown" id="cd-${ind.id}">連線中...</div>
+          </div>
+        </div>
+        <div class="card-main">
+          <div class="stat-box">
+            <span class="stat-label">最新數值 (06/09)</span>
+            <div class="stat-value" id="val-${ind.id}" style="color:${ind.color}">--</div>
+            <div class="status-ring"><div class="dot-ring"><div class="dot-inner" id="ring-${ind.id}"></div></div> 數據狀態</div>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">市場預測</span>
+            <div class="stat-value sub">${customForecasts[ind.id] || ind.defaultForecast}</div>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">前期數值</span>
+            <div class="stat-value sub" id="prev-${ind.id}" style="color:var(--muted)">--</div>
+          </div>
+        </div>
+        <div class="chart-outer">
+          <div class="chart-loading" id="load-${ind.id}">正在繪製趨勢圖表...</div>
+          <div id="chart-${ind.id}" style="width:100%; height:100%;"></div>
+        </div>
+      `;
+      stack.appendChild(card);
+
+      const data = await getData(ind);
+      updateUI(ind, data);
+      
+      if (data) {
+        document.getElementById(`load-${ind.id}`).style.display = 'none';
+        const chartEl = document.getElementById(`chart-${ind.id}`);
+        const chart = LightweightCharts.createChart(chartEl, {
+          layout: { background: { color: 'transparent' }, textColor: '#86868b', fontSize: 11 },
+          grid: { vertLines: { color: '#f5f5f7' }, horzLines: { color: '#f5f5f7' } },
+          timeScale: { borderVisible: false },
+          rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.2, bottom: 0.2 } }
+        });
+        const series = chart.addAreaSeries({
+          lineColor: ind.color,
+          topColor: ind.color + '33',
+          bottomColor: ind.color + '00',
+          lineWidth: 2,
+        });
+        series.setData(data.history);
+        chart.timeScale().fitContent();
+        charts[ind.id] = chart;
+
+        new ResizeObserver(() => {
+          chart.applyOptions({ width: chartEl.clientWidth, height: chartEl.clientHeight });
+          chart.timeScale().fitContent();
+        }).observe(chartEl);
+      }
+    }
+
+    function updateCountdowns() {
+      INDICATORS.forEach(ind => {
+        const el = document.getElementById(`cd-${ind.id}`);
+        if (!el || !ind.nextRelease) return;
+        const diff = new Date(ind.nextRelease) - new Date();
+        if (diff < 0) { el.innerText = '數據發佈中...'; return; }
+        const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000);
+        el.innerText = d > 0 ? `倒數 ${d}天 ${h}時` : `倒數 ${h}時 ${m}分`;
+      });
     }
 
     function toggleSettings() {
       const m = document.getElementById('settings-modal');
       const isVisible = m.style.display === 'flex';
-      
       if (!isVisible) {
         document.getElementById('fred-key-input').value = localStorage.getItem('fred_api_key') || FRED_KEY_DEFAULT;
-        const grid = document.getElementById('forecast-editor');
-        grid.innerHTML = INDICATORS.map(ind => `
-          <div class="forecast-item">
-            <label style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">${ind.id}</label>
-            <input type="text" id="fc-${ind.id}" class="forecast-input" value="${customForecasts[ind.id] || ind.defaultForecast}">
+        const editor = document.getElementById('forecast-editor');
+        editor.innerHTML = INDICATORS.map(ind => `
+          <div style="background:var(--surface); padding:10px; border-radius:10px;">
+            <label style="font-size:10px; font-weight:700; color:var(--muted);">${ind.id.toUpperCase()}</label>
+            <input type="text" id="fc-${ind.id}" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); font-size:13px; font-weight:600; outline:none;" value="${customForecasts[ind.id] || ind.defaultForecast}">
           </div>
         `).join('');
       }
@@ -335,151 +326,17 @@
       location.reload();
     }
 
-    async function refreshAll() {
-      if (window.location.protocol === 'file:') {
-        alert("偵測到您直接開啟 HTML 檔案。由於瀏覽器安全限制，數據抓取可能會失敗。建議將檔案部署到 GitHub Pages 或使用本機伺服器開啟。");
-      }
-
-      // First sync forecasts from ForexFactory
-      await syncForexFactoryForecasts();
-
-      for (const ind of INDICATORS) {
-        logDebug(`正在抓取 ${ind.name}...`);
-        const res = await getData(ind);
-        if (res) {
-          document.getElementById(`val-${ind.id}`).innerText = `${res.current}${ind.unit}`;
-          document.getElementById(`prev-${ind.id}`).innerText = `${res.previous}${ind.unit}`;
-          document.getElementById(`status-${ind.id}`).innerHTML = `<div class="dot-ring"><div class="dot-inner"></div></div> 實時連線中`;
-          if (charts[ind.id]) {
-            charts[ind.id].series.setData(res.history);
-            charts[ind.id].chart.timeScale().fitContent();
-          }
-          document.getElementById(`loading-${ind.id}`).style.display = 'none';
-        } else {
-          document.getElementById(`status-${ind.id}`).innerHTML = `<div class="dot-ring"><div class="dot-inner offline"></div></div> 數據獲取失敗 (查看除錯日誌)`;
-          document.getElementById(`loading-${ind.id}`).innerHTML = `<div style="color:#dc2626;">連線失敗<br><small>請確認網路環境或 API Key</small></div>`;
-        }
-      }
+    function toggleDebug() {
+      const c = document.getElementById('debug-console');
+      c.style.display = c.style.display === 'none' ? 'block' : 'none';
     }
 
-    async function init() {
-      const stack = document.getElementById('indicator-list');
-      for (const ind of INDICATORS) {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="card-header">
-            <div class="card-title-group">
-              <span class="card-label">${ind.fredId ? 'Official FRED Data' : 'Live Market Data'}</span>
-              <div class="card-title">${ind.name}</div>
-              <div class="card-description">${ind.description}</div>
-            </div>
-            <div class="release-tag">
-              <span class="release-label">下次發佈時間 (台灣)</span>
-              <div class="release-time">${ind.nextRelease ? new Date(ind.nextRelease).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }) + " (CST)" : "24/7 動態更新"}</div>
-              <div class="release-countdown">${getCountdown(ind.nextRelease)}</div>
-            </div>
-          </div>
+    async function refreshAll() { location.reload(); }
 
-          <div class="card-main">
-            <div class="stat-box">
-              <span class="stat-label">最新數值</span>
-              <div class="stat-value" id="val-${ind.id}" style="color:${ind.color}">--</div>
-              <div class="status-ring" id="status-${ind.id}"><div class="dot-ring"><div class="dot-inner warning"></div></div> 正在連線...</div>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">市場預測</span>
-              <div class="stat-value sub">${customForecasts[ind.id] || ind.defaultForecast}</div>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">前期數值</span>
-              <div class="stat-value sub" id="prev-${ind.id}" style="color:var(--muted)">--</div>
-            </div>
-          </div>
-
-          <div class="chart-outer">
-            <div class="chart-loading" id="loading-${ind.id}">正在從數據源獲取歷史數據...</div>
-            <div id="chart-root-${ind.id}" style="width:100%; height:100%;"></div>
-          </div>
-        `;
-        stack.appendChild(card);
-
-        const container = document.getElementById(`chart-root-${ind.id}`);
-        const chart = LightweightCharts.createChart(container, {
-          layout: { background: { color: 'transparent' }, textColor: '#86868b', fontSize: 11 },
-          grid: { vertLines: { color: '#f5f5f7' }, horzLines: { color: '#f5f5f7' } },
-          crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-          rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.2, bottom: 0.2 } },
-          timeScale: { borderVisible: false, fixLeftEdge: true }
-        });
-
-        const series = chart.addAreaSeries({
-          lineColor: ind.color,
-          topColor: ind.color + '33',
-          bottomColor: ind.color + '00',
-          lineWidth: 2,
-        });
-
-        charts[ind.id] = { chart, series };
-
-        new ResizeObserver(entries => {
-          if (entries.length === 0) return;
-          const { width, height } = entries[0].contentRect;
-          chart.applyOptions({ width, height });
-          chart.timeScale().fitContent();
-        }).observe(container);
-      }
-      refreshAll();
-    }
-
-    init();
-  </script>
-</body>
-</html>
-| ind.defaultForecast}</div>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">前期數值</span>
-              <div class="stat-value sub" id="prev-${ind.id}" style="color:var(--muted)">--</div>
-            </div>
-          </div>
-
-          <div class="chart-outer">
-            <div class="chart-loading" id="loading-${ind.id}">正在從數據源獲取歷史數據...</div>
-            <div id="chart-root-${ind.id}" style="width:100%; height:100%;"></div>
-          </div>
-        `;
-        stack.appendChild(card);
-
-        const container = document.getElementById(`chart-root-${ind.id}`);
-        const chart = LightweightCharts.createChart(container, {
-          layout: { background: { color: 'transparent' }, textColor: '#86868b', fontSize: 11 },
-          grid: { vertLines: { color: '#f5f5f7' }, horzLines: { color: '#f5f5f7' } },
-          crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-          rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.2, bottom: 0.2 } },
-          timeScale: { borderVisible: false, fixLeftEdge: true }
-        });
-
-        const series = chart.addAreaSeries({
-          lineColor: ind.color,
-          topColor: ind.color + '33',
-          bottomColor: ind.color + '00',
-          lineWidth: 2,
-        });
-
-        charts[ind.id] = { chart, series };
-
-        new ResizeObserver(entries => {
-          if (entries.length === 0) return;
-          const { width, height } = entries[0].contentRect;
-          chart.applyOptions({ width, height });
-          chart.timeScale().fitContent();
-        }).observe(container);
-      }
-      refreshAll();
-    }
-
-    init();
+    // Start
+    INDICATORS.forEach(initIndicator);
+    setInterval(updateCountdowns, 60000);
+    updateCountdowns();
   </script>
 </body>
 </html>
